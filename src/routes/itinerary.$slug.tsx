@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, Sunrise, Sun, Sunset, Moon, Camera, Clock } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { getCity, type Spot, type City } from "@/lib/photospot-data";
+import { cityImage } from "@/lib/city-images";
 import { usePreferences } from "@/components/PreferencesCard";
 import { personalizedTip } from "@/lib/preferences";
 
@@ -48,6 +49,7 @@ function pickForSlot(spots: Spot[], slot: typeof SLOTS[number]["key"]): Spot {
 function ItineraryPage() {
   const { city } = Route.useLoaderData();
   const { value: prefs } = usePreferences();
+  const img = cityImage(city.slug);
 
   const used = new Set<string>();
   const plan = SLOTS.map((slot) => {
@@ -61,19 +63,31 @@ function ItineraryPage() {
     <div className="min-h-screen bg-background">
       <AppHeader />
 
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 py-10">
-        <Link
-          to="/city/$slug"
-          params={{ slug: city.slug }}
-          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" /> Back to {city.name}
-        </Link>
-        <p className="mt-4 text-[11px] uppercase tracking-[0.25em] text-primary">One perfect day</p>
-        <h1 className="mt-1 font-display text-4xl font-semibold sm:text-5xl">
-          {city.name} in 24 hours
-        </h1>
-        <p className="mt-2 text-muted-foreground max-w-xl">
+      {/* Hero */}
+      <section className="relative h-[42svh] min-h-[280px] overflow-hidden">
+        {img && (
+          <img src={img} alt="" className="absolute inset-0 h-full w-full object-cover animate-ken-burns" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-background/30" />
+        <div className="relative z-10 mx-auto flex h-full max-w-3xl flex-col justify-between px-5 sm:px-8 pt-6 pb-8">
+          <Link
+            to="/city/$slug"
+            params={{ slug: city.slug }}
+            className="inline-flex w-fit items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 text-xs text-white/90 backdrop-blur-md ring-1 ring-white/10"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> Back to {city.name}
+          </Link>
+          <div className="animate-fade-up">
+            <p className="text-[10px] uppercase tracking-[0.28em] text-primary">One perfect day</p>
+            <h1 className="mt-2 font-display text-4xl font-semibold tracking-[-0.02em] text-white sm:text-6xl">
+              {city.name} in 24h
+            </h1>
+          </div>
+        </div>
+      </section>
+
+      <div className="mx-auto max-w-3xl px-5 sm:px-8 py-10">
+        <p className="text-muted-foreground max-w-xl">
           A photographer's itinerary chasing light from dawn to neon.
         </p>
 
