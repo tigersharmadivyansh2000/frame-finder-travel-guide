@@ -1,10 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, MapPin, CalendarDays, List, Map as MapIcon } from "lucide-react";
+import { ArrowLeft, MapPin, CalendarDays, List, Map as MapIcon, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { SpotCard } from "@/components/SpotCard";
 import { PreferencesCard, usePreferences } from "@/components/PreferencesCard";
 import { getCity, type City, type Spot } from "@/lib/photospot-data";
+import { cityImage } from "@/lib/city-images";
 import { personalizedTip } from "@/lib/preferences";
 
 export const Route = createFileRoute("/city/$slug")({
@@ -48,6 +49,7 @@ function CityPage() {
   const { city } = Route.useLoaderData();
   const { value: prefs, setValue: setPrefs } = usePreferences();
   const [view, setView] = useState<"list" | "map">("list");
+  const img = cityImage(city.slug);
 
   const main = city.spots.filter((s: Spot) => !s.hidden);
   const hidden = city.spots.filter((s: Spot) => s.hidden);
@@ -56,35 +58,54 @@ function CityPage() {
     <div className="min-h-screen bg-background">
       <AppHeader />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0" style={{ background: city.gradient, opacity: 0.85 }} />
-        <div className="absolute inset-0" style={{ background: "var(--gradient-overlay)" }} />
-        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 pt-10 pb-12">
-          <Link to="/" className="inline-flex items-center gap-1.5 text-xs text-white/80 hover:text-white">
+      {/* Cinematic hero */}
+      <section className="relative h-[68svh] min-h-[440px] w-full overflow-hidden">
+        {img ? (
+          <img
+            src={img}
+            alt={city.name}
+            className="absolute inset-0 h-full w-full object-cover animate-ken-burns"
+          />
+        ) : (
+          <div className="absolute inset-0" style={{ background: city.gradient }} />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-transparent" />
+
+        <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-between px-5 pt-6 pb-10 sm:px-8 sm:pb-14">
+          <Link
+            to="/"
+            className="inline-flex w-fit items-center gap-1.5 rounded-full bg-black/40 px-3 py-1.5 text-xs text-white/90 backdrop-blur-md ring-1 ring-white/10 hover:bg-black/60 transition"
+          >
             <ArrowLeft className="h-3.5 w-3.5" /> All cities
           </Link>
-          <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.25em] text-white/70">{city.country}</p>
-              <h1 className="mt-1 font-display text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-                {city.name}
-              </h1>
-              <p className="mt-2 max-w-xl text-white/85">{city.tagline}</p>
+
+          <div className="animate-fade-up">
+            <p className="text-[10px] uppercase tracking-[0.28em] text-primary">{city.country}</p>
+            <h1 className="mt-2 font-display text-5xl font-semibold tracking-[-0.02em] text-white sm:text-7xl">
+              {city.name}
+            </h1>
+            <p className="mt-3 max-w-md text-white/80 sm:text-lg">{city.tagline}</p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              <Link
+                to="/itinerary/$slug"
+                params={{ slug: city.slug }}
+                className="inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-transform active:scale-95"
+                style={{ background: "var(--gradient-sunset)" }}
+              >
+                <CalendarDays className="h-4 w-4" />
+                1-day itinerary
+              </Link>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-black/40 px-4 py-2.5 text-sm text-white backdrop-blur-md ring-1 ring-white/10">
+                <MapPin className="h-4 w-4 text-primary" />
+                {city.spots.length} spots
+              </span>
             </div>
-            <Link
-              to="/itinerary/$slug"
-              params={{ slug: city.slug }}
-              className="inline-flex items-center gap-1.5 rounded-full bg-background/90 px-4 py-2 text-sm font-medium text-foreground backdrop-blur hover:bg-background"
-            >
-              <CalendarDays className="h-4 w-4 text-primary" />
-              1-day itinerary
-            </Link>
           </div>
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8 space-y-8">
+      <div className="mx-auto max-w-6xl px-5 sm:px-8 py-10 space-y-10">
         <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 text-sm text-foreground/90">
           <span className="font-medium text-primary">AI tuning · </span>
           {personalizedTip(prefs)}
@@ -94,17 +115,17 @@ function CityPage() {
 
         {/* View toggle */}
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-2xl font-semibold">Top spots</h2>
-          <div className="inline-flex rounded-full border border-border bg-card p-1 text-xs">
+          <h2 className="font-display text-3xl font-semibold tracking-tight">Top spots</h2>
+          <div className="inline-flex rounded-full border border-white/10 bg-card p-1 text-xs">
             <button
               onClick={() => setView("list")}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition ${view === "list" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition ${view === "list" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
             >
               <List className="h-3.5 w-3.5" /> List
             </button>
             <button
               onClick={() => setView("map")}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition ${view === "map" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition ${view === "map" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
             >
               <MapIcon className="h-3.5 w-3.5" /> Map
             </button>
@@ -112,23 +133,25 @@ function CityPage() {
         </div>
 
         {view === "list" ? (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 stagger">
             {main.map((s: Spot) => (
               <SpotCard key={s.id} spot={s} citySlug={city.slug} cityName={city.name} />
             ))}
           </div>
         ) : (
-          <MapStub spots={city.spots} cityName={city.name} />
+          <MapStub spots={city.spots} cityName={city.name} bgImage={img} />
         )}
 
         {hidden.length > 0 && (
           <section className="pt-6">
             <div className="mb-4 flex items-center gap-2">
-              <span className="h-px flex-1 bg-border" />
-              <p className="text-[11px] uppercase tracking-[0.25em] text-primary">Hidden gems</p>
-              <span className="h-px flex-1 bg-border" />
+              <span className="h-px flex-1 bg-white/10" />
+              <p className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.25em] text-primary">
+                <Sparkles className="h-3 w-3" /> Hidden gems
+              </p>
+              <span className="h-px flex-1 bg-white/10" />
             </div>
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 stagger">
               {hidden.map((s: Spot) => (
                 <SpotCard key={s.id} spot={s} citySlug={city.slug} cityName={city.name} />
               ))}
@@ -140,41 +163,56 @@ function CityPage() {
   );
 }
 
-function MapStub({ spots, cityName }: { spots: { id: string; name: string; area: string; gradient: string }[]; cityName: string }) {
+function MapStub({
+  spots,
+  cityName,
+  bgImage,
+}: {
+  spots: { id: string; name: string; area: string; gradient: string }[];
+  cityName: string;
+  bgImage?: string;
+}) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
-      <div className="relative aspect-[16/10] w-full" style={{ background: "var(--gradient-night)" }}>
-        {/* faux map grid */}
+    <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-card shadow-[var(--shadow-elegant)]">
+      <div className="relative aspect-[4/5] sm:aspect-[16/10] w-full">
+        {bgImage ? (
+          <img src={bgImage} alt="" className="absolute inset-0 h-full w-full object-cover saturate-[0.6] brightness-[0.45]" />
+        ) : (
+          <div className="absolute inset-0" style={{ background: "var(--gradient-night)" }} />
+        )}
         <div
-          className="absolute inset-0 opacity-30"
+          className="absolute inset-0 opacity-25 mix-blend-overlay"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
+              "linear-gradient(rgba(255,255,255,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.12) 1px, transparent 1px)",
+            backgroundSize: "44px 44px",
           }}
         />
         {spots.map((s, i) => {
           const x = 12 + ((i * 73) % 76);
-          const y = 15 + ((i * 41) % 65);
+          const y = 18 + ((i * 41) % 62);
           return (
             <div
               key={s.id}
-              className="absolute -translate-x-1/2 -translate-y-full"
-              style={{ left: `${x}%`, top: `${y}%` }}
+              className="absolute -translate-x-1/2 -translate-y-full animate-fade-up"
+              style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${i * 90}ms` }}
             >
               <div className="flex flex-col items-center">
-                <div className="rounded-md border border-border bg-background/90 px-2 py-1 text-[11px] font-medium text-foreground backdrop-blur">
+                <div className="rounded-full bg-black/60 px-3 py-1.5 text-[11px] font-medium text-white backdrop-blur-md ring-1 ring-white/15 whitespace-nowrap">
                   {s.name}
                 </div>
-                <div className="mt-1 h-2 w-2 rounded-full bg-primary shadow-[0_0_12px_2px_var(--color-primary)]" />
+                <div className="relative mt-1.5 h-3 w-3">
+                  <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-60" />
+                  <span className="absolute inset-0 rounded-full bg-primary shadow-[0_0_14px_3px_var(--color-primary)]" />
+                </div>
               </div>
             </div>
           );
         })}
       </div>
-      <div className="flex items-center gap-2 border-t border-border px-4 py-3 text-xs text-muted-foreground">
+      <div className="flex items-center gap-2 border-t border-white/5 bg-card px-4 py-3 text-xs text-muted-foreground">
         <MapPin className="h-3.5 w-3.5 text-primary" />
-        Map preview for {cityName} · live map coming with Google Maps integration
+        Map preview for {cityName} · live Google Maps coming next
       </div>
     </div>
   );
