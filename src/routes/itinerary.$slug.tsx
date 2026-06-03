@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, Sunrise, Sun, Sunset, Moon, Camera, Clock } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
-import { getCity, type Spot } from "@/lib/photospot-data";
+import { getCity, type Spot, type City } from "@/lib/photospot-data";
 import { usePreferences } from "@/components/PreferencesCard";
 import { personalizedTip } from "@/lib/preferences";
 
@@ -9,7 +9,7 @@ export const Route = createFileRoute("/itinerary/$slug")({
   loader: ({ params }) => {
     const city = getCity(params.slug);
     if (!city) throw notFound();
-    return { city };
+    return { city } as { city: City };
   },
   head: ({ loaderData }) => ({
     meta: loaderData

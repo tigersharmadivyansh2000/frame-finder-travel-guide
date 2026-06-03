@@ -4,14 +4,14 @@ import { useState } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { SpotCard } from "@/components/SpotCard";
 import { PreferencesCard, usePreferences } from "@/components/PreferencesCard";
-import { getCity } from "@/lib/photospot-data";
+import { getCity, type City } from "@/lib/photospot-data";
 import { personalizedTip } from "@/lib/preferences";
 
 export const Route = createFileRoute("/city/$slug")({
   loader: ({ params }) => {
     const city = getCity(params.slug);
     if (!city) throw notFound();
-    return { city };
+    return { city } as { city: City };
   },
   head: ({ loaderData }) => ({
     meta: loaderData
