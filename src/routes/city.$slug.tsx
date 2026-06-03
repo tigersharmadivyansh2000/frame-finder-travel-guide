@@ -139,7 +139,7 @@ function CityPage() {
             ))}
           </div>
         ) : (
-          <MapStub spots={city.spots} cityName={city.name} />
+          <MapStub spots={city.spots} cityName={city.name} bgImage={img} />
         )}
 
         {hidden.length > 0 && (
@@ -163,41 +163,56 @@ function CityPage() {
   );
 }
 
-function MapStub({ spots, cityName }: { spots: { id: string; name: string; area: string; gradient: string }[]; cityName: string }) {
+function MapStub({
+  spots,
+  cityName,
+  bgImage,
+}: {
+  spots: { id: string; name: string; area: string; gradient: string }[];
+  cityName: string;
+  bgImage?: string;
+}) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
-      <div className="relative aspect-[16/10] w-full" style={{ background: "var(--gradient-night)" }}>
-        {/* faux map grid */}
+    <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-card shadow-[var(--shadow-elegant)]">
+      <div className="relative aspect-[4/5] sm:aspect-[16/10] w-full">
+        {bgImage ? (
+          <img src={bgImage} alt="" className="absolute inset-0 h-full w-full object-cover saturate-[0.6] brightness-[0.45]" />
+        ) : (
+          <div className="absolute inset-0" style={{ background: "var(--gradient-night)" }} />
+        )}
         <div
-          className="absolute inset-0 opacity-30"
+          className="absolute inset-0 opacity-25 mix-blend-overlay"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
+              "linear-gradient(rgba(255,255,255,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.12) 1px, transparent 1px)",
+            backgroundSize: "44px 44px",
           }}
         />
         {spots.map((s, i) => {
           const x = 12 + ((i * 73) % 76);
-          const y = 15 + ((i * 41) % 65);
+          const y = 18 + ((i * 41) % 62);
           return (
             <div
               key={s.id}
-              className="absolute -translate-x-1/2 -translate-y-full"
-              style={{ left: `${x}%`, top: `${y}%` }}
+              className="absolute -translate-x-1/2 -translate-y-full animate-fade-up"
+              style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${i * 90}ms` }}
             >
               <div className="flex flex-col items-center">
-                <div className="rounded-md border border-border bg-background/90 px-2 py-1 text-[11px] font-medium text-foreground backdrop-blur">
+                <div className="rounded-full bg-black/60 px-3 py-1.5 text-[11px] font-medium text-white backdrop-blur-md ring-1 ring-white/15 whitespace-nowrap">
                   {s.name}
                 </div>
-                <div className="mt-1 h-2 w-2 rounded-full bg-primary shadow-[0_0_12px_2px_var(--color-primary)]" />
+                <div className="relative mt-1.5 h-3 w-3">
+                  <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-60" />
+                  <span className="absolute inset-0 rounded-full bg-primary shadow-[0_0_14px_3px_var(--color-primary)]" />
+                </div>
               </div>
             </div>
           );
         })}
       </div>
-      <div className="flex items-center gap-2 border-t border-border px-4 py-3 text-xs text-muted-foreground">
+      <div className="flex items-center gap-2 border-t border-white/5 bg-card px-4 py-3 text-xs text-muted-foreground">
         <MapPin className="h-3.5 w-3.5 text-primary" />
-        Map preview for {cityName} · live map coming with Google Maps integration
+        Map preview for {cityName} · live Google Maps coming next
       </div>
     </div>
   );
