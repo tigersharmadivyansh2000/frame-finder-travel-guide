@@ -9,38 +9,75 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SavedRouteImport } from './routes/saved'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ItinerarySlugRouteImport } from './routes/itinerary.$slug'
+import { Route as CitySlugRouteImport } from './routes/city.$slug'
 
+const SavedRoute = SavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ItinerarySlugRoute = ItinerarySlugRouteImport.update({
+  id: '/itinerary/$slug',
+  path: '/itinerary/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CitySlugRoute = CitySlugRouteImport.update({
+  id: '/city/$slug',
+  path: '/city/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/saved': typeof SavedRoute
+  '/city/$slug': typeof CitySlugRoute
+  '/itinerary/$slug': typeof ItinerarySlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/saved': typeof SavedRoute
+  '/city/$slug': typeof CitySlugRoute
+  '/itinerary/$slug': typeof ItinerarySlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/saved': typeof SavedRoute
+  '/city/$slug': typeof CitySlugRoute
+  '/itinerary/$slug': typeof ItinerarySlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/saved' | '/city/$slug' | '/itinerary/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/saved' | '/city/$slug' | '/itinerary/$slug'
+  id: '__root__' | '/' | '/saved' | '/city/$slug' | '/itinerary/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SavedRoute: typeof SavedRoute
+  CitySlugRoute: typeof CitySlugRoute
+  ItinerarySlugRoute: typeof ItinerarySlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/saved': {
+      id: '/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof SavedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,12 +85,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/itinerary/$slug': {
+      id: '/itinerary/$slug'
+      path: '/itinerary/$slug'
+      fullPath: '/itinerary/$slug'
+      preLoaderRoute: typeof ItinerarySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/city/$slug': {
+      id: '/city/$slug'
+      path: '/city/$slug'
+      fullPath: '/city/$slug'
+      preLoaderRoute: typeof CitySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SavedRoute: SavedRoute,
+  CitySlugRoute: CitySlugRoute,
+  ItinerarySlugRoute: ItinerarySlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
