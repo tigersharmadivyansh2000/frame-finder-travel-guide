@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { SpotCard } from "@/components/SpotCard";
 import { PreferencesCard, usePreferences } from "@/components/PreferencesCard";
-import { getCity, type City } from "@/lib/photospot-data";
+import { getCity, type City, type Spot } from "@/lib/photospot-data";
 import { personalizedTip } from "@/lib/preferences";
 
 export const Route = createFileRoute("/city/$slug")({
@@ -49,8 +49,8 @@ function CityPage() {
   const { value: prefs, setValue: setPrefs } = usePreferences();
   const [view, setView] = useState<"list" | "map">("list");
 
-  const main = city.spots.filter((s) => !s.hidden);
-  const hidden = city.spots.filter((s) => s.hidden);
+  const main = city.spots.filter((s: Spot) => !s.hidden);
+  const hidden = city.spots.filter((s: Spot) => s.hidden);
 
   return (
     <div className="min-h-screen bg-background">
@@ -113,7 +113,7 @@ function CityPage() {
 
         {view === "list" ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {main.map((s) => (
+            {main.map((s: Spot) => (
               <SpotCard key={s.id} spot={s} citySlug={city.slug} cityName={city.name} />
             ))}
           </div>
@@ -129,7 +129,7 @@ function CityPage() {
               <span className="h-px flex-1 bg-border" />
             </div>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {hidden.map((s) => (
+              {hidden.map((s: Spot) => (
                 <SpotCard key={s.id} spot={s} citySlug={city.slug} cityName={city.name} />
               ))}
             </div>

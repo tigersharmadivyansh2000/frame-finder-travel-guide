@@ -51,7 +51,7 @@ function ItineraryPage() {
 
   const used = new Set<string>();
   const plan = SLOTS.map((slot) => {
-    const candidates = city.spots.filter((s) => !used.has(s.id));
+    const candidates = city.spots.filter((s: Spot) => !used.has(s.id));
     const spot = pickForSlot(candidates.length ? candidates : city.spots, slot.key);
     used.add(spot.id);
     return { slot, spot };
