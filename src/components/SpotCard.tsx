@@ -1,8 +1,9 @@
-import { Bookmark, Clock, Users, Camera, Aperture, Sparkles, ChevronDown } from "lucide-react";
+import { Bookmark, Clock, Users, Camera, Aperture, Sparkles, ChevronDown, Wand2 } from "lucide-react";
 import { useState } from "react";
 import { useLocalStorage } from "@/lib/use-local-storage";
 import type { Spot } from "@/lib/photospot-data";
 import { cityImage } from "@/lib/city-images";
+import { AssistantPanel } from "./AssistantPanel";
 
 const crowdColor: Record<Spot["crowd"], string> = {
   Low: "text-emerald-400",
@@ -23,6 +24,7 @@ export function SpotCard({ spot, citySlug, cityName }: Props) {
   );
   const [pop, setPop] = useState(false);
   const [open, setOpen] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
   const isSaved = hydrated && saved.includes(spot.id);
   const img = cityImage(citySlug);
 
@@ -145,6 +147,20 @@ export function SpotCard({ spot, citySlug, cityName }: Props) {
             ))}
           </ul>
         </div>
+
+        <button
+          onClick={() => setAiOpen((v) => !v)}
+          className="flex w-full items-center justify-between rounded-full border border-primary/30 bg-primary/10 px-3.5 py-2 text-xs font-medium text-primary transition hover:bg-primary/15"
+        >
+          <span className="inline-flex items-center gap-1.5">
+            <Wand2 className="h-3.5 w-3.5" />
+            AI Photography Assistant
+          </span>
+          <ChevronDown
+            className={`h-3.5 w-3.5 transition-transform duration-300 ${aiOpen ? "rotate-180" : ""}`}
+          />
+        </button>
+        {aiOpen && <AssistantPanel spot={spot} cityName={cityName} />}
       </div>
 
       <span className="sr-only">{citySlug}</span>
