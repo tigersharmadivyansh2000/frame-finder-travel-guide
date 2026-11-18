@@ -28,7 +28,9 @@ export const Route = createFileRoute("/city/$slug")({
       : [],
   }),
   errorComponent: ({ error }) => (
-    <div className="p-10 text-center text-muted-foreground">Couldn't load city: {error.message}</div>
+    <div className="p-10 text-center text-muted-foreground">
+      Couldn't load city: {error instanceof Error ? error.message : String(error)}
+    </div>
   ),
   notFoundComponent: () => (
     <div className="min-h-screen bg-background">

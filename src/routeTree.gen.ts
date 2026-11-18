@@ -9,29 +9,29 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SavedRouteImport } from './routes/saved'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ItinerarySlugRouteImport } from './routes/itinerary.$slug'
+import { Route as SavedRouteImport } from './routes/saved'
 import { Route as CitySlugRouteImport } from './routes/city.$slug'
+import { Route as ItinerarySlugRouteImport } from './routes/itinerary.$slug'
 
-const SavedRoute = SavedRouteImport.update({
-  id: '/saved',
-  path: '/saved',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ItinerarySlugRoute = ItinerarySlugRouteImport.update({
-  id: '/itinerary/$slug',
-  path: '/itinerary/$slug',
+const SavedRoute = SavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CitySlugRoute = CitySlugRouteImport.update({
   id: '/city/$slug',
   path: '/city/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ItinerarySlugRoute = ItinerarySlugRouteImport.update({
+  id: '/itinerary/$slug',
+  path: '/itinerary/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -71,13 +71,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/saved': {
-      id: '/saved'
-      path: '/saved'
-      fullPath: '/saved'
-      preLoaderRoute: typeof SavedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -85,11 +78,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/itinerary/$slug': {
-      id: '/itinerary/$slug'
-      path: '/itinerary/$slug'
-      fullPath: '/itinerary/$slug'
-      preLoaderRoute: typeof ItinerarySlugRouteImport
+    '/saved': {
+      id: '/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof SavedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/city/$slug': {
@@ -97,6 +90,13 @@ declare module '@tanstack/react-router' {
       path: '/city/$slug'
       fullPath: '/city/$slug'
       preLoaderRoute: typeof CitySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/itinerary/$slug': {
+      id: '/itinerary/$slug'
+      path: '/itinerary/$slug'
+      fullPath: '/itinerary/$slug'
+      preLoaderRoute: typeof ItinerarySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -111,3 +111,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

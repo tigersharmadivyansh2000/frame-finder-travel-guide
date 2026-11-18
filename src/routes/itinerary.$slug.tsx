@@ -24,7 +24,9 @@ export const Route = createFileRoute("/itinerary/$slug")({
       : [],
   }),
   errorComponent: ({ error }) => (
-    <div className="p-10 text-center text-muted-foreground">Couldn't load itinerary: {error.message}</div>
+    <div className="p-10 text-center text-muted-foreground">
+      Couldn't load itinerary: {error instanceof Error ? error.message : String(error)}
+    </div>
   ),
   notFoundComponent: () => (
     <div className="p-10 text-center">City not found.</div>
